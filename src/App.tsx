@@ -4,13 +4,16 @@ import AppShell from './components/AppShell';
 import { getIdentity, setIdentity, getServers, saveServer } from './lib/db';
 import { Plus } from 'lucide-react';
 import { customAlphabet } from 'nanoid';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 21);
 
 function App() {
-  const [identity, setId] = useState(null);
-  const [servers, setServers] = useState([]);
-  const [activeServer, setActiveServer] = useState(null);
+  const [identity, setId] = useState<any>(null);
+  const [servers, setServers] = useState<any[]>([]);
+  const [activeServer, setActiveServer] = useState<any>(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [loading, setLoading] = useState(true);
@@ -115,44 +118,47 @@ function App() {
           onLeaveServer={() => handleLeaveServer(activeServer)}
         />
       ) : (
-        <div className="no-server-view">
-          <h2>No servers yet</h2>
-          <p>Create or join a server to get started</p>
-          <button className="btn-primary" style={{ width: 'auto', padding: '0.7rem 2rem' }} onClick={() => setShowJoinModal(true)}>
+        <div className="no-server-view text-center flex flex-col items-center gap-4">
+          <h2 className="text-2xl font-bold">No servers yet</h2>
+          <p className="text-muted-foreground">Create or join a server to get started</p>
+          <Button className="w-auto px-8 bg-brand-500 hover:bg-brand-560 text-white" onClick={() => setShowJoinModal(true)}>
             Add Server
-          </button>
+          </Button>
         </div>
       )}
 
-      {showJoinModal && (
-        <div className="modal-overlay" onClick={() => setShowJoinModal(false)}>
-          <div className="modal-card" onClick={e => e.stopPropagation()}>
-            <h2>Add a Server</h2>
-            <p className="subtitle">Create a new server or join an existing one</p>
-            <button className="btn-primary" onClick={handleCreateServer}>
+      <Dialog open={showJoinModal} onOpenChange={setShowJoinModal}>
+        <DialogContent className="sm:max-w-md bg-card border-none outline-none">
+          <DialogHeader>
+            <DialogTitle>Add a Server</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <p className="text-sm text-muted-foreground">Create a new server or join an existing one</p>
+            <Button onClick={handleCreateServer} className="w-full bg-brand-500 hover:bg-brand-560 text-white border-0">
               Create Server
-            </button>
-            <div className="modal-divider">
-              <span>or</span>
+            </Button>
+            <div className="flex items-center gap-2">
+              <span className="w-full border-t border-border"></span>
+              <span className="text-xs text-muted-foreground uppercase uppercase tracking-wider">or</span>
+              <span className="w-full border-t border-border"></span>
             </div>
-            <form onSubmit={handleJoinServer}>
-              <div className="input-block">
-                <label>Server Code</label>
-                <input
-                  type="text"
-                  placeholder="Enter server code"
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                  autoFocus
-                />
-              </div>
-              <button type="submit" className="btn-primary btn-secondary" disabled={!joinCode.trim()}>
+            <form onSubmit={handleJoinServer} className="flex flex-col gap-3">
+              <label className="text-xs font-bold text-muted-foreground uppercase">Server Code</label>
+              <Input
+                type="text"
+                placeholder="Enter server code"
+                value={joinCode}
+                onChange={(e) => setJoinCode(e.target.value)}
+                autoFocus
+                className="bg-[var(--bg-tertiary)] border-none text-[var(--text-normal)] focus-visible:ring-1 focus-visible:ring-[var(--brand-500)]"
+              />
+              <Button type="submit" variant="secondary" disabled={!joinCode.trim()} className="w-full">
                 Join Server
-              </button>
+              </Button>
             </form>
           </div>
-        </div>
-      )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
